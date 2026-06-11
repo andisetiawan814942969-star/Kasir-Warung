@@ -65,6 +65,26 @@
   --transition-slow: 400ms ease;
 }
 
+/* Light Theme Overrides */
+[data-theme="light"] {
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f1f5f9;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-hover: rgba(99, 102, 241, 0.08);
+  --bg-input: #ffffff;
+
+  --border-color: rgba(148, 163, 184, 0.3);
+  --border-active: rgba(99, 102, 241, 0.6);
+
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+
+  --shadow-glow: 0 4px 15px rgba(99, 102, 241, 0.15);
+}
+
 /* ===== Global Reset ===== */
 *,
 *::before,

@@ -7,12 +7,16 @@ import {
   HiOutlineDocumentText,
   HiOutlineUserCircle,
   HiOutlineArrowRightOnRectangle,
-  HiOutlineBars3
+  HiOutlineBars3,
+  HiOutlineSun,
+  HiOutlineMoon
 } from 'react-icons/hi2';
 import { getGreeting, getTodayDate } from '../utils/formatters';
+import { useTheme } from '../context/ThemeContext';
 
 const KasirLayout = () => {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -94,7 +98,15 @@ const KasirLayout = () => {
               {getGreeting()}, <strong>{user?.name}</strong>
             </div>
           </div>
-          <div className="navbar-right">
+          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <button 
+              className="btn-icon" 
+              onClick={toggleTheme} 
+              title={theme === 'dark' ? 'Mode Terang' : 'Mode Gelap'}
+              style={{ background: 'var(--bg-tertiary)', color: 'var(--text-primary)' }}
+            >
+              {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
+            </button>
             <div className="navbar-date">{getTodayDate()}</div>
           </div>
         </div>

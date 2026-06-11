@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Pages
 import LoginPage from './pages/LoginPage';
@@ -82,63 +83,65 @@ const LoginGuard = () => {
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Toaster 
-          position="top-right"
-          toastOptions={{
-            duration: 3000,
-            style: {
-              background: 'var(--bg-secondary)',
-              color: 'var(--text-primary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: 'var(--border-radius-sm)',
-              fontSize: '0.9rem'
-            },
-            success: {
-              iconTheme: { primary: 'var(--success)', secondary: 'white' }
-            },
-            error: {
-              iconTheme: { primary: 'var(--danger)', secondary: 'white' }
-            }
-          }}
-        />
-        
-        <Routes>
-          {/* Public */}
-          <Route path="/login" element={<LoginGuard />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                background: 'var(--bg-secondary)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--border-radius-sm)',
+                fontSize: '0.9rem'
+              },
+              success: {
+                iconTheme: { primary: 'var(--success)', secondary: 'white' }
+              },
+              error: {
+                iconTheme: { primary: 'var(--danger)', secondary: 'white' }
+              }
+            }}
+          />
           
-          {/* Admin Routes */}
-          <Route path="/admin" element={
-            <ProtectedRoute allowedRoles={['admin']}>
-              <AdminLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<AdminProducts />} />
-            <Route path="categories" element={<AdminCategories />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="transactions" element={<AdminTransactions />} />
-            <Route path="pos" element={<POSPage />} />
-          </Route>
+          <Routes>
+            {/* Public */}
+            <Route path="/login" element={<LoginGuard />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<AdminDashboard />} />
+              <Route path="products" element={<AdminProducts />} />
+              <Route path="categories" element={<AdminCategories />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="transactions" element={<AdminTransactions />} />
+              <Route path="pos" element={<POSPage />} />
+            </Route>
 
-          {/* Kasir Routes */}
-          <Route path="/kasir" element={
-            <ProtectedRoute allowedRoles={['kasir']}>
-              <KasirLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<KasirPOS />} />
-            <Route path="history" element={<KasirHistory />} />
-            <Route path="profile" element={<KasirProfile />} />
-          </Route>
+            {/* Kasir Routes */}
+            <Route path="/kasir" element={
+              <ProtectedRoute allowedRoles={['kasir']}>
+                <KasirLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<KasirPOS />} />
+              <Route path="history" element={<KasirHistory />} />
+              <Route path="profile" element={<KasirProfile />} />
+            </Route>
 
-          {/* Root redirect */}
-          <Route path="/" element={<RoleRedirect />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* Root redirect */}
+            <Route path="/" element={<RoleRedirect />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
