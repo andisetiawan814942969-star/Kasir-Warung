@@ -47,6 +47,11 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ message: 'User tidak ditemukan' });
     }
 
+    // Mencegah admin mengubah rolenya sendiri menjadi kasir (demote)
+    if (role && role !== 'admin' && req.params.id === req.user._id.toString()) {
+      return res.status(400).json({ message: 'Anda tidak bisa mengubah role Anda sendiri dari Admin' });
+    }
+
     if (name) user.name = name;
     if (email) user.email = email;
     if (password) user.password = password;
