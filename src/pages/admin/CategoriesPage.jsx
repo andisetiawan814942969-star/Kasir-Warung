@@ -10,6 +10,7 @@ const CategoriesPage = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [name, setName] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchCategories();
@@ -39,6 +40,7 @@ const CategoriesPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       if (editingCategory) {
         await categoryAPI.update(editingCategory._id, { name });
@@ -51,10 +53,13 @@ const CategoriesPage = () => {
       fetchCategories();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyimpan kategori');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
+    setSubmitting(true);
     try {
       await categoryAPI.delete(confirmDelete._id);
       toast.success('Kategori berhasil dihapus');
@@ -62,6 +67,8 @@ const CategoriesPage = () => {
       fetchCategories();
     } catch (error) {
       toast.error('Gagal menghapus kategori');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -150,9 +157,9 @@ const CategoriesPage = () => {
                 />
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Batal</button>
-                <button type="submit" className="btn btn-primary" id="save-category-btn">
-                  {editingCategory ? 'Update' : 'Simpan'}
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={submitting}>Batal</button>
+                <button type="submit" className="btn btn-primary" id="save-category-btn" disabled={submitting}>
+                  {submitting ? 'Memproses...' : (editingCategory ? 'Update' : 'Simpan')}
                 </button>
               </div>
             </form>
@@ -167,8 +174,10 @@ const CategoriesPage = () => {
             <h3>Hapus Kategori?</h3>
             <p>Anda yakin ingin menghapus <strong>{confirmDelete.name}</strong>?</p>
             <div className="confirm-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Batal</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Hapus</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)} disabled={submitting}>Batal</button>
+              <button className="btn btn-danger" onClick={handleDelete} disabled={submitting}>
+                {submitting ? 'Menghapus...' : 'Hapus'}
+              </button>
             </div>
           </div>
         </div>

@@ -17,6 +17,7 @@ const ProductsPage = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [form, setForm] = useState({ name: '', category: '', price: '', stock: '', unit: 'pcs' });
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -56,6 +57,7 @@ const ProductsPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       if (editingProduct) {
         await productAPI.update(editingProduct._id, form);
@@ -68,10 +70,13 @@ const ProductsPage = () => {
       fetchData();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyimpan produk');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
+    setSubmitting(true);
     try {
       await productAPI.delete(confirmDelete._id);
       toast.success('Produk berhasil dihapus');
@@ -79,6 +84,8 @@ const ProductsPage = () => {
       fetchData();
     } catch (error) {
       toast.error('Gagal menghapus produk');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -285,11 +292,11 @@ const ProductsPage = () => {
               </div>
 
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={submitting}>
                   Batal
                 </button>
-                <button type="submit" className="btn btn-primary" id="save-product-btn">
-                  {editingProduct ? 'Update' : 'Simpan'}
+                <button type="submit" className="btn btn-primary" id="save-product-btn" disabled={submitting}>
+                  {submitting ? 'Memproses...' : (editingProduct ? 'Update' : 'Simpan')}
                 </button>
               </div>
             </form>
@@ -305,8 +312,10 @@ const ProductsPage = () => {
             <h3>Hapus Produk?</h3>
             <p>Anda yakin ingin menghapus <strong>{confirmDelete.name}</strong>?</p>
             <div className="confirm-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Batal</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Hapus</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)} disabled={submitting}>Batal</button>
+              <button className="btn btn-danger" onClick={handleDelete} disabled={submitting}>
+                {submitting ? 'Menghapus...' : 'Hapus'}
+              </button>
             </div>
           </div>
         </div>

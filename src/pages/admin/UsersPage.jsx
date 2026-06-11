@@ -11,6 +11,7 @@ const UsersPage = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'kasir' });
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -40,6 +41,7 @@ const UsersPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
       const data = { ...form };
       if (editingUser && !data.password) delete data.password;
@@ -55,10 +57,13 @@ const UsersPage = () => {
       fetchUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menyimpan user');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
+    setSubmitting(true);
     try {
       await userAPI.delete(confirmDelete._id);
       toast.success('User berhasil dihapus');
@@ -66,6 +71,8 @@ const UsersPage = () => {
       fetchUsers();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Gagal menghapus user');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -189,9 +196,9 @@ const UsersPage = () => {
                 </select>
               </div>
               <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>Batal</button>
-                <button type="submit" className="btn btn-primary" id="save-user-btn">
-                  {editingUser ? 'Update' : 'Simpan'}
+                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)} disabled={submitting}>Batal</button>
+                <button type="submit" className="btn btn-primary" id="save-user-btn" disabled={submitting}>
+                  {submitting ? 'Memproses...' : (editingUser ? 'Update' : 'Simpan')}
                 </button>
               </div>
             </form>
@@ -206,8 +213,10 @@ const UsersPage = () => {
             <h3>Hapus User?</h3>
             <p>Anda yakin ingin menghapus <strong>{confirmDelete.name}</strong>?</p>
             <div className="confirm-actions">
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>Batal</button>
-              <button className="btn btn-danger" onClick={handleDelete}>Hapus</button>
+              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)} disabled={submitting}>Batal</button>
+              <button className="btn btn-danger" onClick={handleDelete} disabled={submitting}>
+                {submitting ? 'Menghapus...' : 'Hapus'}
+              </button>
             </div>
           </div>
         </div>

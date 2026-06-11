@@ -14,12 +14,13 @@ import {
   HiOutlineSun,
   HiOutlineMoon
 } from 'react-icons/hi2';
-import { getGreeting, getTodayDate } from '../utils/formatters';
 import { useTheme } from '../context/ThemeContext';
+import { useClock } from '../hooks/useClock';
 
 const AdminLayout = () => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { timeString, dateString, greeting } = useClock();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -105,7 +106,7 @@ const AdminLayout = () => {
               <HiOutlineBars3 size={20} />
             </button>
             <div className="greeting">
-              {getGreeting()}, <strong>{user?.name}</strong>
+              {greeting}, <strong>{user?.name}</strong>
             </div>
           </div>
           <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
@@ -117,7 +118,10 @@ const AdminLayout = () => {
             >
               {theme === 'dark' ? <HiOutlineSun size={20} /> : <HiOutlineMoon size={20} />}
             </button>
-            <div className="navbar-date">{getTodayDate()}</div>
+            <div className="navbar-date">
+              <span style={{ fontWeight: 600, marginRight: '8px' }}>{timeString}</span>
+              {dateString}
+            </div>
           </div>
         </div>
 
