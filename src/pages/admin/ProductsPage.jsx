@@ -15,7 +15,8 @@ const ProductsPage = () => {
   const [filterCategory, setFilterCategory] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [form, setForm] = useState({ name: '', category: '', price: '', stock: '', unit: 'pcs' });
+  const [form, setForm] = useState({ name: '', category: '', price: '', stock: '', unit: 'pcs', image: null });
+  const [imagePreview, setImagePreview] = useState('');
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,11 +47,14 @@ const ProductsPage = () => {
         category: product.category?._id || '',
         price: product.price,
         stock: product.stock,
-        unit: product.unit
+        unit: product.unit,
+        image: null
       });
+      setImagePreview(product.image || '');
     } else {
       setEditingProduct(null);
-      setForm({ name: '', category: '', price: '', stock: '', unit: 'pcs' });
+      setForm({ name: '', category: '', price: '', stock: '', unit: 'pcs', image: null });
+      setImagePreview('');
     }
     setShowModal(true);
   };
@@ -59,11 +63,21 @@ const ProductsPage = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
+      const formData = new FormData();
+      formData.append('name', form.name);
+      formData.append('category', form.category);
+      formData.append('price', form.price);
+      formData.append('stock', form.stock);
+      formData.append('unit', form.unit);
+      if (form.image) {
+        formData.append('image', form.image);
+      }
+
       if (editingProduct) {
-        await productAPI.update(editingProduct._id, form);
+        await productAPI.update(editingProduct._id, formData);
         toast.success('Produk berhasil diupdate');
       } else {
-        await productAPI.create(form);
+        await productAPI.create(formData);
         toast.success('Produk berhasil ditambahkan');
       }
       setShowModal(false);
@@ -160,7 +174,18 @@ const ProductsPage = () => {
               products.map((product, index) => (
                 <tr key={product._id}>
                   <td>{index + 1}</td>
-                  <td style={{ fontWeight: 600 }}>{product.name}</td>
+                  <td>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '4px' }} />
+                      ) : (
+                        <div style={{ width: 40, height: 40, background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', color: 'var(--text-muted)' }}>
+                          <HiOutlineCube size={20} />
+                        </div>
+                      )}
+                      <span style={{ fontWeight: 600 }}>{product.name}</span>
+                    </div>
+                  </td>
                   <td>
                     <span className="badge badge-primary">
                       {product.category?.name || '-'}
@@ -240,6 +265,25 @@ const ProductsPage = () => {
                     <option key={cat._id} value={cat._id}>{cat.name}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Gambar Produk (Opsional)</label>
+                <input
+                  type="file"
+                  className="form-input"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setForm({ ...form, image: file });
+                      setImagePreview(URL.createObjectURL(file));
+                    }
+                  }}
+                />
+                {imagePreview && (
+                  <img src={imagePreview} alt="Preview" style={{ width: '100%', maxHeight: 200, objectFit: 'contain', marginTop: 8, borderRadius: 8, border: '1px solid var(--border-color)' }} />
+                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

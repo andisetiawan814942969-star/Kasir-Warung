@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const { deleteCloudinaryImage } = require('../config/cloudinary');
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -52,7 +53,11 @@ exports.getProduct = async (req, res) => {
 // @route   POST /api/products
 exports.createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const productData = { ...req.body };
+    if (req.file) {
+      productData.image = req.file.path;
+    }
+    const product = await Product.create(productData);
     const populated = await product.populate('category', 'name');
     res.status(201).json(populated);
   } catch (error) {
@@ -67,9 +72,23 @@ exports.createProduct = async (req, res) => {
 // @route   PUT /api/products/:id
 exports.updateProduct = async (req, res) => {
   try {
+    const productData = { ...req.body };
+    const oldProduct = await Product.findById(req.params.id);
+    
+    if (!oldProduct) {
+      return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    }
+
+    if (req.file) {
+      productData.image = req.file.path;
+      if (oldProduct.image) {
+        await deleteCloudinaryImage(oldProduct.image);
+      }
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      productData,
       { new: true, runValidators: true }
     ).populate('category', 'name');
 
@@ -91,6 +110,10 @@ exports.deleteProduct = async (req, res) => {
 
     if (!product) {
       return res.status(404).json({ message: 'Produk tidak ditemukan' });
+    }
+
+    if (product.image) {
+      await deleteCloudinaryImage(product.image);
     }
 
     res.json({ message: 'Produk berhasil dihapus' });

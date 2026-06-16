@@ -4,7 +4,7 @@ import { formatCurrency } from '../../utils/formatters';
 import { 
   HiOutlineShoppingCart, HiOutlineMagnifyingGlass, HiOutlinePlus, 
   HiOutlineMinus, HiOutlineTrash, HiOutlineXMark, HiOutlineBanknotes,
-  HiOutlineCheckCircle
+  HiOutlineCheckCircle, HiOutlineCube
 } from 'react-icons/hi2';
 import toast from 'react-hot-toast';
 
@@ -176,6 +176,13 @@ const POSPage = () => {
                 className={`pos-product-card ${product.stock <= 0 ? 'out-of-stock' : ''}`}
                 onClick={() => addToCart(product)}
               >
+                {product.image ? (
+                  <img src={product.image} alt={product.name} style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '4px', marginBottom: '8px' }} />
+                ) : (
+                  <div style={{ width: '100%', height: '120px', background: 'var(--bg-tertiary)', borderRadius: '4px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                    <HiOutlineCube size={32} />
+                  </div>
+                )}
                 <div className="product-name">{product.name}</div>
                 <div className="product-price">{formatCurrency(product.price)}</div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -215,8 +222,15 @@ const POSPage = () => {
               </div>
             ) : (
               cart.map(item => (
-                <div key={item.product._id} className="cart-item">
-                  <div className="cart-item-info">
+                <div key={item.product._id} className="cart-item" style={{ gap: '12px' }}>
+                  {item.product.image ? (
+                    <img src={item.product.image} alt="" style={{ width: 40, height: 40, borderRadius: 4, objectFit: 'cover', flexShrink: 0 }} />
+                  ) : (
+                    <div style={{ width: 40, height: 40, background: 'var(--bg-tertiary)', borderRadius: 4, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', flexShrink: 0 }}>
+                      <HiOutlineCube size={20} />
+                    </div>
+                  )}
+                  <div className="cart-item-info" style={{ flex: 1 }}>
                     <div className="cart-item-name">{item.product.name}</div>
                     <div className="cart-item-price">{formatCurrency(item.product.price)} / {item.product.unit}</div>
                   </div>

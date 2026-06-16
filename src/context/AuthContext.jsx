@@ -26,6 +26,19 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
+
+    // Logout otomatis ketika tombol maju/mundur browser ditekan
+    const handlePopState = () => {
+      // Memanggil fungsi logout yang menghapus token & user data
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('user');
+      setUser(null);
+      // Force reload ke halaman login untuk menghindari cache react-router
+      window.location.replace('/login');
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
   const login = async (email, password) => {

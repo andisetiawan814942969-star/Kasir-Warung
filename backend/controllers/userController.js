@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const { deleteCloudinaryImage } = require('../config/cloudinary');
 
 // @desc    Get all users (admin only)
 // @route   GET /api/users
@@ -15,20 +16,33 @@ exports.getUsers = async (req, res) => {
 // @route   POST /api/users
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, canEditProfile } = req.body;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'Email sudah terdaftar' });
     }
 
-    const user = await User.create({ name, email, password, role });
+    const userData = { 
+      name, 
+      email, 
+      password, 
+      role, 
+      canEditProfile: role === 'admin' ? true : (canEditProfile === 'true' || canEditProfile === true)
+    };
+    if (req.file) {
+      userData.image = req.file.path;
+    }
+
+    const user = await User.create(userData);
 
     res.status(201).json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      canEditProfile: user.canEditProfile,
+      image: user.image,
       createdAt: user.createdAt
     });
   } catch (error) {
@@ -40,7 +54,7 @@ exports.createUser = async (req, res) => {
 // @route   PUT /api/users/:id
 exports.updateUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, canEditProfile } = req.body;
     const user = await User.findById(req.params.id).select('+password');
 
     if (!user) {
@@ -55,7 +69,19 @@ exports.updateUser = async (req, res) => {
     if (name) user.name = name;
     if (email) user.email = email;
     if (password) user.password = password;
-    if (role) user.role = role;
+    if (role) {
+      user.role = role;
+      if (role === 'admin') user.canEditProfile = true;
+    }
+    if (canEditProfile !== undefined && user.role !== 'admin') {
+      user.canEditProfile = (canEditProfile === 'true' || canEditProfile === true);
+    }
+    if (req.file) {
+      if (user.image) {
+        await deleteCloudinaryImage(user.image);
+      }
+      user.image = req.file.path;
+    }
 
     await user.save();
 
@@ -64,6 +90,8 @@ exports.updateUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      canEditProfile: user.canEditProfile,
+      image: user.image,
       createdAt: user.createdAt
     });
   } catch (error) {
@@ -87,6 +115,10 @@ exports.deleteUser = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: 'User tidak ditemukan' });
+    }
+
+    if (user.image) {
+      await deleteCloudinaryImage(user.image);
     }
 
     res.json({ message: 'User berhasil dihapus' });

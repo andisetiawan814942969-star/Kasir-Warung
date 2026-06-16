@@ -9,13 +9,15 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setErrorMsg('');
     if (!email || !password) {
-      toast.error('Email dan password harus diisi');
+      setErrorMsg('Email dan password harus diisi');
       return;
     }
 
@@ -30,7 +32,9 @@ const LoginPage = () => {
         navigate('/kasir');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Login gagal');
+      const message = error.response?.data?.message || 'Email atau password salah';
+      setErrorMsg(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -46,6 +50,22 @@ const LoginPage = () => {
           <h1>Warung Sembako</h1>
           <p>Sistem Kasir Digital</p>
         </div>
+
+        {errorMsg && (
+          <div style={{
+            background: 'var(--danger-bg)',
+            color: 'var(--danger)',
+            border: '1px solid var(--danger)',
+            padding: '12px 16px',
+            borderRadius: 'var(--border-radius-sm)',
+            marginBottom: '20px',
+            fontSize: '0.9rem',
+            textAlign: 'center',
+            fontWeight: 500
+          }}>
+            ⚠️ {errorMsg}
+          </div>
+        )}
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -97,7 +117,6 @@ const LoginPage = () => {
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '24px', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
-          <p>Demo: admin@warung.com / admin123</p>
           <p>Demo: kasir@warung.com / kasir123</p>
         </div>
       </div>

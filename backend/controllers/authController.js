@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { deleteCloudinaryImage } = require('../config/cloudinary');
 
 // Generate JWT token
 const generateToken = (id) => {
@@ -38,7 +39,9 @@ exports.login = async (req, res) => {
         _id: user._id,
         name: user.name,
         email: user.email,
-        role: user.role
+        role: user.role,
+        canEditProfile: user.canEditProfile,
+        image: user.image
       }
     });
   } catch (error) {
@@ -55,7 +58,9 @@ exports.getMe = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      canEditProfile: user.canEditProfile,
+      image: user.image
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -69,9 +74,19 @@ exports.updateProfile = async (req, res) => {
     const { name, email, password } = req.body;
     const user = await User.findById(req.user._id).select('+password');
 
+    if (user.role !== 'admin' && !user.canEditProfile) {
+      return res.status(403).json({ message: 'Anda tidak memiliki izin untuk mengedit profil. Hubungi Administrator.' });
+    }
+
     if (name) user.name = name;
     if (email) user.email = email;
     if (password) user.password = password;
+    if (req.file) {
+      if (user.image) {
+        await deleteCloudinaryImage(user.image);
+      }
+      user.image = req.file.path;
+    }
 
     await user.save();
 
@@ -79,7 +94,9 @@ exports.updateProfile = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
+      canEditProfile: user.canEditProfile,
+      image: user.image
     });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });

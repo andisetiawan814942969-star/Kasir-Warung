@@ -24,6 +24,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'kasir'],
     default: 'kasir'
+  },
+  canEditProfile: {
+    type: Boolean,
+    default: false
+  },
+  image: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true
