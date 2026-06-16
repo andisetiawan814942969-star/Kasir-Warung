@@ -74,8 +74,8 @@ const DashboardPage = () => {
 
       {/* Stats Cards */}
       <div className="stats-grid">
-        <div className="stat-card purple">
-          <div className="stat-icon purple">
+        <div className="stat-card">
+          <div className="stat-icon">
             <HiOutlineBanknotes />
           </div>
           <div className="stat-info">
@@ -84,8 +84,8 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="stat-card cyan">
-          <div className="stat-icon cyan">
+        <div className="stat-card">
+          <div className="stat-icon">
             <HiOutlineShoppingCart />
           </div>
           <div className="stat-info">
@@ -94,8 +94,8 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="stat-card green">
-          <div className="stat-icon green">
+        <div className="stat-card">
+          <div className="stat-icon">
             <HiOutlineCube />
           </div>
           <div className="stat-info">
@@ -104,8 +104,8 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="stat-card orange">
-          <div className="stat-icon orange">
+        <div className="stat-card">
+          <div className="stat-icon">
             <HiOutlineExclamationTriangle />
           </div>
           <div className="stat-info">
@@ -114,8 +114,8 @@ const DashboardPage = () => {
           </div>
         </div>
 
-        <div className="stat-card red">
-          <div className="stat-icon red">
+        <div className="stat-card">
+          <div className="stat-icon">
             <HiOutlineUsers />
           </div>
           <div className="stat-info">
@@ -152,16 +152,10 @@ const DashboardPage = () => {
                 <Tooltip content={<CustomTooltip />} />
                 <Bar 
                   dataKey="sales" 
-                  fill="url(#colorGradient)" 
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={50}
+                  fill="var(--text-primary)" 
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={40}
                 />
-                <defs>
-                  <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--primary)" stopOpacity={1} />
-                    <stop offset="100%" stopColor="var(--primary-dark)" stopOpacity={0.6} />
-                  </linearGradient>
-                </defs>
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -191,9 +185,9 @@ const DashboardPage = () => {
                     width: 32,
                     height: 32,
                     borderRadius: '50%',
-                    background: index === 0 ? 'linear-gradient(135deg, #f59e0b, #d97706)' : 
-                                index === 1 ? 'linear-gradient(135deg, #94a3b8, #64748b)' :
-                                index === 2 ? 'linear-gradient(135deg, #b45309, #92400e)' :
+                    background: index === 0 ? 'var(--warning)' : 
+                                index === 1 ? 'var(--secondary)' :
+                                index === 2 ? 'var(--accent)' :
                                 'var(--bg-tertiary)',
                     display: 'flex',
                     alignItems: 'center',
@@ -232,7 +226,7 @@ const DashboardPage = () => {
         <div className="card">
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 8 }}>Total Penjualan (Semua)</p>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--success-light)' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {formatCurrency(stats?.totalSales || 0)}
             </h2>
           </div>
@@ -240,7 +234,7 @@ const DashboardPage = () => {
         <div className="card">
           <div style={{ textAlign: 'center' }}>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: 8 }}>Total Transaksi (Semua)</p>
-            <h2 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary-light)' }}>
+            <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--text-primary)' }}>
               {formatNumber(stats?.totalTransactions || 0)}
             </h2>
           </div>
